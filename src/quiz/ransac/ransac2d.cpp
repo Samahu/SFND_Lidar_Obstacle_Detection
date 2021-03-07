@@ -61,7 +61,7 @@ pcl::visualization::PCLVisualizer::Ptr initScene()
   	return viewer;
 }
 
-std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
+std::unordered_set<int> Ransac2D(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
 {
 	std::unordered_set<int> inliersResult;
 	srand(time(NULL));
@@ -117,6 +117,66 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 
 }
 
+std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int maxIterations, float distanceTol)
+{
+	std::unordered_set<int> inliersResult;
+	srand(time(NULL));
+	
+	// TODO: Fill in this function
+
+	// For max iterations
+  	for (auto i = 0; i < maxIterations; ++i)
+    {
+		// Randomly sample subset and fit line
+      	std::unordered_set<int> subset;
+      	while (subset.size() < 3)
+          subset.insert(rand() % cloud->points.size());
+      
+      	auto itr = subset.begin();
+		auto p1_index = *(itr++);
+      	auto p2_index = *(itr++);
+      	auto p3_index = *(itr++);
+      	cout << "selected: " << p1_index << ", " << p2_index << ", " << p3_index << endl;
+      
+      	auto p1 = cloud->points[p1_index];
+      	auto p2 = cloud->points[p2_index];
+      	auto p3 = cloud->points[p3_index];
+      
+      	Eigen::Vector3f v1 = p1.getArray3fMap();
+      	Eigen::Vector3f v2 = p2.getArray3fMap();
+      	Eigen::Vector3f v3 = p3.getArray3fMap();
+      
+      	auto v1_v2 = v2 - v1;
+      	auto v1_v3 = v3 - v1;
+      	auto c = v1_v2.cross(v1_v3);
+      
+      	auto A = c.x();
+		auto B = c.y();
+		auto C = c.z();
+		auto D = -( c.x() * p1.x + c.y() * p1.y + c.z() * p1.z );
+      
+      	// Measure distance between every point and fitted line
+		// If distance is smaller than threshold count it as inlier
+      	std::unordered_set<int> currentInliers;
+      	for (auto j = 0; j < cloud->points.size(); ++j)
+        {
+          auto p = cloud->points[j];
+          auto d = fabs(A*p.x+B*p.y+C*p.z+D) / sqrt(A*A+B*B+C*C);
+                    
+          if (d <= distanceTol)
+            currentInliers.insert(j);
+        }
+      
+      	cout << "currentInliers.size(): " << currentInliers.size() << " < " << inliersResult.size() << endl;
+      	if (currentInliers.size() > inliersResult.size())
+          inliersResult = currentInliers;
+    }
+
+  	// Return indicies of inliers from fitted line with most inliers
+	return inliersResult;
+
+}
+
 int main ()
 {
 
@@ -124,7 +184,7 @@ int main ()
 	pcl::visualization::PCLVisualizer::Ptr viewer = initScene();
 
 	// Create data
-	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr cloud = CreateData3D();
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
