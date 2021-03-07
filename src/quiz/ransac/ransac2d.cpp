@@ -87,9 +87,9 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
       	auto p2 = cloud->points[p2_index];
       	auto x2 = p2.x;
       	auto y2 = p2.y;
-        auto A = y1 - y2;
-        auto B = x2 - x1;
-        auto C = x1 * y2 - x2 * y1;
+      	auto A = y1 - y2;
+      	auto B = x2 - x1;
+      	auto C = x1 * y2 - x2 * y1;
 
 		// Measure distance between every point and fitted line
 		// If distance is smaller than threshold count it as inlier
@@ -100,7 +100,7 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
           
           auto x0 = p.x;
           auto y0 = p.y;
-          auto d = abs(A * x0 + B * y0 + C) / sqrt(A * A + B * B);
+          auto d = fabs(A * x0 + B * y0 + C) / sqrt(A * A + B * B);
 
           if (d <= distanceTol)
           {
