@@ -68,15 +68,51 @@ std::unordered_set<int> Ransac(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int ma
 	
 	// TODO: Fill in this function
 
-	// For max iterations 
+	// For max iterations
+  	for (auto i = 0; i < maxIterations; ++i)
+    {
+		// Randomly sample subset and fit line
+		auto p1_index = static_cast<int>(cloud->points.size() * ((double) (rand() - 1) / RAND_MAX));
+      	auto p2_index = static_cast<int>(cloud->points.size() * ((double) (rand() - 1) / RAND_MAX));
+      
+      	if (p1_index == p2_index)
+        {
+          cout << "invalid sample!!";
+          continue;
+        }
+      
+      	auto p1 = cloud->points[p1_index];
+      	auto x1 = p1.x;
+      	auto y1 = p1.y;
+      	auto p2 = cloud->points[p2_index];
+      	auto x2 = p2.x;
+      	auto y2 = p2.y;
+        auto A = y1 - y2;
+        auto B = x2 - x1;
+        auto C = x1 * y2 - x2 * y1;
 
-	// Randomly sample subset and fit line
+		// Measure distance between every point and fitted line
+		// If distance is smaller than threshold count it as inlier
+      	std::unordered_set<int> currentInliers;
+      	for (auto j = 0; j < cloud->points.size(); ++j)
+        {
+          auto p = cloud->points[j];
+          
+          auto x0 = p.x;
+          auto y0 = p.y;
+          auto d = abs(A * x0 + B * y0 + C) / sqrt(A * A + B * B);
 
-	// Measure distance between every point and fitted line
-	// If distance is smaller than threshold count it as inlier
+          if (d <= distanceTol)
+          {
+            currentInliers.insert(j);
+          }
+        }
+      
+      	if (currentInliers.size() > inliersResult.size())
+          inliersResult = currentInliers;
+    }
 
-	// Return indicies of inliers from fitted line with most inliers
-	
+  	// Return indicies of inliers from fitted line with most inliers
 	return inliersResult;
 
 }
@@ -92,7 +128,7 @@ int main ()
 	
 
 	// TODO: Change the max iteration and distance tolerance arguments for Ransac function
-	std::unordered_set<int> inliers = Ransac(cloud, 0, 0);
+	std::unordered_set<int> inliers = Ransac(cloud, 50, 0.5);
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr  cloudInliers(new pcl::PointCloud<pcl::PointXYZ>());
 	pcl::PointCloud<pcl::PointXYZ>::Ptr cloudOutliers(new pcl::PointCloud<pcl::PointXYZ>());
