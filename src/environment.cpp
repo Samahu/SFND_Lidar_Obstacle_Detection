@@ -78,7 +78,9 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer)
 {
     ProcessPointClouds<pcl::PointXYZI> pointProcessor;
     pcl::PointCloud<pcl::PointXYZI>::Ptr pointCloud = pointProcessor.loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
-    renderPointCloud(viewer, pointCloud, "inputCloud");
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor.FilterCloud(pointCloud, 0.2,
+        Eigen::Vector4f(-8, -5, -5, 1), Eigen::Vector4f(8, 5, 5, 1));
+    renderPointCloud(viewer, filteredCloud, "inputCloud");
 }
 
 
