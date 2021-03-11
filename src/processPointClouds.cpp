@@ -75,7 +75,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
   // TODO: Create two new point clouds, one cloud with obstacles and other with segmented plane
   typename pcl::PointCloud<PointT>::Ptr obstaclesCloud(new pcl::PointCloud<PointT>);
   typename pcl::PointCloud<PointT>::Ptr planeCloud(new pcl::PointCloud<PointT>);
-  pcl::ExtractIndices<pcl::PointXYZ> extract;
+  pcl::ExtractIndices<PointT> extract;
   // Extract the inliers
   extract.setInputCloud (cloud);
   extract.setIndices (inliers);
@@ -159,7 +159,7 @@ std::pair<typename pcl::PointCloud<PointT>::Ptr, typename pcl::PointCloud<PointT
     // TODO:: Fill in this function to find inliers for the cloud.
     pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
     // Create the segmentation object
-    pcl::SACSegmentation<pcl::PointXYZ> seg;
+    pcl::SACSegmentation<PointT> seg;
     // Optional
     seg.setOptimizeCoefficients (true);
     // Mandatory  
