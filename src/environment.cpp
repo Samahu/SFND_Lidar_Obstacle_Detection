@@ -80,7 +80,7 @@ void cityBlock(pcl::visualization::PCLVisualizer::Ptr& viewer,
 {
     // pcl::PointCloud<pcl::PointXYZI>::Ptr pointCloud = pointProcessor->loadPcd("../src/sensors/data/pcd/data_1/0000000000.pcd");
     pcl::PointCloud<pcl::PointXYZI>::Ptr filteredCloud = pointProcessor->FilterCloud(inputCloud, 0.2,
-        Eigen::Vector4f(-8, -5, -5, 1), Eigen::Vector4f(16, 5, 5, 1));
+        Eigen::Vector4f(-10, -5, -2, 1), Eigen::Vector4f(30, 8, 1, 1));
 
     std::pair<pcl::PointCloud<pcl::PointXYZI>::Ptr, pcl::PointCloud<pcl::PointXYZI>::Ptr> segmentCloud =
       pointProcessor->SegmentPlane(filteredCloud, 100, 0.2);
